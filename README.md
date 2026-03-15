@@ -1,4 +1,4 @@
-# Officer Accountability Portal
+# CHP Accountability Portal
 
 **Newanforbi v. Meza-Gonzalez** — A structured accountability tracker for the November 1, 2024 incident on I-580, Livermore, CA.
 
