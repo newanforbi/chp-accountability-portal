@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Officer Accountability Portal — Newanforbi v. Meza-Gonzalez</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #F8FAFC; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const CASE_DATA = {
+      officer: "Santiago Meza-Gonzalez",
+      badge: "#023295",
+      partner: "Jose Melano",
+      partnerBadge: "#023054",
+      incident: "November 1, 2024",
+      location: "I-580 East, Livermore, Alameda County, CA",
+      caseNumber: "RJ68845",
+      federalCase: "2:25-cv-01460-DC-CSK",
+      plaintiff: "Brendan Ngehsi Newanforbi",
+    };
+
+    const ACCOUNTABILITY_TRACKS = [
+      {
+        id: "criminal",
+        title: "Criminal Prosecution",
+        icon: "⚖️",
+        color: "#DC2626",
+        accent: "#FEE2E2",
+        deadline: "3 years (tolled by discovery rule)",
+        description: "Felony charges for perjury and evidence fabrication",
+        steps: [
+          {
+            title: "Document the Perjury Evidence",
+            status: "action",
+            detail: "Compile a side-by-side comparison of Officer Meza-Gonzalez's sworn DS-367 statements vs. the dashcam transcript. Key fabrications include: (1) He swore he smelled alcohol from breath/person — dashcam shows only urine was identified; (2) He checked 'Admission of Driving' — transcript shows you said you were parked 5-7 minutes; (3) The CHP 202 report omits the unconstitutional rear-compartment search entirely.",
+            evidence: ["Dashcam transcript (Exhibit A)", "DS-367 Officer's Statement", "CHP 202 Arrest Report", "PC §849(b)(1) Detention Certificate"],
+            laws: ["PC §118 — Perjury", "PC §132 — Offering False Evidence", "PC §134 — Preparing False Evidence", "PC §118.1 — Filing False Police Report"],
+          },
+          {
+            title: "File Criminal Complaint with Alameda County DA",
+            status: "action",
+            detail: "Submit a formal criminal referral to the Alameda County District Attorney's Public Integrity Unit. The DA has a dedicated division for officer misconduct cases. Include the Detention Certificate — it is the CHP's own institutional admission that there were 'insufficient grounds for making a criminal complaint,' directly contradicting the sworn DS-367.",
+            evidence: ["All compiled evidence packet", "PC §849(b)(1) Detention Certificate", "Payroll records showing $112K+ economic damages"],
+            contact: "Alameda County District Attorney\nPublic Integrity Unit\nhttps://www.alcoda.org/divisions/",
+          },
+          {
+            title: "File Parallel Complaint with CA Attorney General",
+            status: "action",
+            detail: "Submit a PIU3 complaint form to the California Attorney General's Bureau of Investigation. The AG has independent authority to prosecute peace officer crimes when local DAs decline or have conflicts of interest. This creates a backup prosecution pathway.",
+            evidence: ["PIU3 Complaint Form", "Complete evidence packet"],
+            contact: "CA Attorney General\nPublic Inquiry Unit\nhttps://oag.ca.gov/police-complaints\nForm: PIU3",
+          },
+          {
+            title: "Monitor Statute of Limitations",
+            status: "info",
+            detail: "The 3-year felony SOL for PC §118, §132, and §134 is protected by the Delayed Discovery Rule (PC §803(c)). The clock started when you discovered the fabrications through dashcam review — NOT November 1, 2024. Keep records of exactly when you first obtained and reviewed the dashcam footage.",
+            laws: ["PC §803(c) — Delayed Discovery Rule applies to PC §118, §132, §134"],
+          },
+        ],
+      },
+      {
+        id: "post",
+        title: "POST Decertification (SB 2)",
+        icon: "🛡️",
+        color: "#7C3AED",
+        accent: "#EDE9FE",
+        deadline: "File ASAP — CHP must report within 10 days",
+        description: "Permanent revocation of peace officer certification",
+        steps: [
+          {
+            title: "File POST Public Complaint",
+            status: "action",
+            detail: "Submit a formal 'serious misconduct' complaint directly to the Commission on Peace Officer Standards and Training (POST) under the SB 2 decertification framework. Cite dishonesty and abuse of power as the basis. Under SB 2, CHP has a mandatory obligation to report the complaint to POST within 10 days — they cannot suppress it.",
+            evidence: ["Dashcam transcript proving fabricated statements", "DS-367 with false sworn claims", "Detention Certificate proving CHP's own admission"],
+            contact: "California POST\nPublic Complaint Form\nhttps://post.ca.gov/public-complaint-form",
+            laws: ["SB 2 — Peace Officer Decertification Act"],
+          },
+          {
+            title: "Understand the Decertification Pathway",
+            status: "info",
+            detail: "POST's Peace Officer Standards Accountability Division investigates. If they find clear and convincing evidence, the case goes to the 9-member Accountability Advisory Board for hearings. A recommendation then goes to the full POST Commission. A two-thirds vote results in PERMANENT decertification and placement on the National Decertification Index (NDI).",
+            laws: ["Gov. Code §13510.8", "SB 2 Decertification Framework"],
+          },
+          {
+            title: "Trigger Immediate Temporary Suspension",
+            status: "info",
+            detail: "If the DA or AG files criminal charges for perjury (PC §118), POST's Executive Director is legally MANDATED to issue an Immediate Temporary Suspension (ITS) of the officer's certification. This instantly strips peace officer powers pending criminal resolution. This is why the criminal track and POST track work together synergistically.",
+            laws: ["POST ITS Provisions under SB 2"],
+          },
+        ],
+      },
+      {
+        id: "chp-ia",
+        title: "CHP Internal Affairs",
+        icon: "📋",
+        color: "#D97706",
+        accent: "#FEF3C7",
+        deadline: "1 year (tolled by civil litigation)",
+        description: "Internal discipline through CHP's complaint process",
+        steps: [
+          {
+            title: "File CHP Civilian Complaint (Form 240B)",
+            status: "action",
+            detail: "Submit a formal civilian complaint using CHP Form 240B against Officer Meza-Gonzalez at the Dublin Area CHP Office (the command where the incident occurred). This triggers the internal affairs investigation process. Even though CHP may be conflicted, the filing creates an official record and triggers POBRA timelines.",
+            evidence: ["CHP Form 240B (Uniformed Employee)", "Complete evidence packet"],
+            contact: "CHP Dublin Area Office\nOR\nhttps://www.chp.ca.gov/faq/\nForm 240B: https://www.chp.ca.gov/contentassets/2ec9e52b99934451850a511e365a7f29/chp240b.pdf",
+          },
+          {
+            title: "Leverage POBRA Tolling from Your Lawsuits",
+            status: "complete",
+            detail: "Your federal lawsuit (Case 2:25-cv-01460-DC-CSK, filed May 27, 2025) and state complaint (Newanforbi v. Meza-Gonzalez) both name the officer as an individual defendant. Under Gov. Code §3304(d)(2)(F), the 1-year POBRA disciplinary clock is ENTIRELY PAUSED while these civil actions are pending. This means CHP cannot escape the deadline by running out the clock while your lawsuits are active.",
+            laws: ["Gov. Code §3304(d)(2)(F) — Civil Litigation Tolling", "Gov. Code §3304(d)(2)(A) — Criminal Investigation Tolling"],
+          },
+        ],
+      },
+      {
+        id: "dmv",
+        title: "DMV Investigation",
+        icon: "🚗",
+        color: "#0891B2",
+        accent: "#CFFAFE",
+        deadline: "Ongoing — tied to APS hearing outcome",
+        description: "Challenge the fraudulent DS-367 and APS suspension",
+        steps: [
+          {
+            title: "File DMV Document Fraud Complaint",
+            status: "action",
+            detail: "File a formal complaint with the DMV Investigations Division specifically regarding the perjured DS-367 form. The officer swore under penalty of perjury that facts were true when they were demonstrably false. The DMV has independent investigative authority over fraudulent documents submitted to its administrative system.",
+            contact: "DMV Investigations Division\nhttps://www.dmv.ca.gov/portal/customer-service/dmv-complaints-ffinv-1/",
+            evidence: ["DS-367 with false sworn statements", "Dashcam transcript contradicting DS-367", "Detention Certificate"],
+          },
+          {
+            title: "Challenge APS Suspension at Hearing",
+            status: "action",
+            detail: "At the DMV APS hearing, challenge all four statutory prongs: (1) No reasonable cause — welfare check was pretextual; (2) No lawful arrest — CVC §40300.5 exceptions don't apply per Mercer v. DMV since vehicle was on dirt shoulder, not obstructing roadway; (3) No proper admonition — investigation was procedurally flawed; (4) Refusal was reasonable response to an illegitimate investigation per McDonnell v. DMV.",
+            laws: ["CVC §40300.5", "Mercer v. DMV (53 Cal. 3d 753)", "CVC §530 — Definition of 'Roadway'", "McDonnell v. DMV (45 Cal.App.3d 653)"],
+          },
+          {
+            title: "Appeal DMV Decision if Unfavorable",
+            status: "info",
+            detail: "If the hearing officer upholds the suspension: (1) Request a departmental review in writing within 15 days ($120 fee); (2) File a writ of mandamus at Alameda County Superior Court within 30 days of the hearing decision. The writ allows a judge to review the entire administrative record, including the dashcam evidence.",
+          },
+        ],
+      },
+      {
+        id: "grand-jury",
+        title: "Alameda County Grand Jury",
+        icon: "🏛️",
+        color: "#059669",
+        accent: "#D1FAE5",
+        deadline: "No strict deadline — file anytime",
+        description: "Independent citizen oversight investigation",
+        steps: [
+          {
+            title: "Submit Grand Jury Complaint",
+            status: "action",
+            detail: "File a complaint with the Alameda County Civil Grand Jury. The Grand Jury is an independent citizen body with subpoena power that investigates government misconduct. They can compel testimony, access sealed records, and issue public reports with binding recommendations. A Grand Jury investigation adds enormous public pressure and can uncover systemic patterns.",
+            contact: "Alameda County Grand Jury\nhttps://grandjury.acgov.org/submit-complaint/",
+            evidence: ["Complete evidence packet", "Documentation of systemic concerns"],
+          },
+        ],
+      },
+      {
+        id: "federal",
+        title: "Federal Civil Rights (Active)",
+        icon: "🇺🇸",
+        color: "#1D4ED8",
+        accent: "#DBEAFE",
+        deadline: "Filed May 27, 2025",
+        description: "42 USC §1983 lawsuit — already in progress",
+        steps: [
+          {
+            title: "Federal Lawsuit Status",
+            status: "complete",
+            detail: "Your federal §1983 civil rights complaint (Newanforbi v. State of California, et al.) was filed May 27, 2025 in the Eastern District of California (Case 2:25-cv-01460-DC-CSK). This 59-page complaint alleges Fourth Amendment violations, false arrest, excessive force, and fabrication of evidence. Claims include: unreasonable search/seizure, false imprisonment, battery, and Bane Act violations (Civil Code §52.1).",
+            laws: ["42 USC §1983", "Fourth Amendment", "Fourteenth Amendment"],
+          },
+          {
+            title: "State Court Complaint Status",
+            status: "complete",
+            detail: "Your state tort action (Newanforbi v. Meza-Gonzalez) is filed in Alameda County Superior Court, asserting False Imprisonment, Battery, and Tom Bane Civil Rights Act (Civil Code §52.1) violations. You complied with the Government Claims Act by filing with DGS in April 2025. The claim was deemed rejected by operation of law after 45 days (Gov. Code §912.4).",
+            laws: ["Civil Code §52.1 — Tom Bane Act", "Gov. Code §815.2 — Vicarious Liability"],
+          },
+        ],
+      },
+    ];
+
+    const EVIDENCE_HIGHLIGHTS = [
+      {
+        category: "Fabricated Alcohol Odor",
+        sworn: "Officer swore he 'smelled the strong distinct odor of an alcoholic beverage coming from breath and person'",
+        reality: "Dashcam shows only odor identified was URINE. Melano said 'This is piss. It smells like piss.' Meza-Gonzalez REFUSED to smell it.",
+        timestamp: "00:58:51 – 00:59:04",
+      },
+      {
+        category: "False 'Admission of Driving'",
+        sworn: "DS-367 checkbox: 'Driver admitted to driving the vehicle' — used to bypass Mercer v. DMV",
+        reality: "Transcript shows plaintiff stated he was PARKED for '5-7 minutes' (00:58:06). No admission of contemporaneous DUI driving.",
+        timestamp: "00:58:06",
+      },
+      {
+        category: "Illegal Vehicle Search (Sanders Violation)",
+        sworn: "CHP 202 report OMITS the rear-compartment search entirely",
+        reality: "Melano searched rear seat at 00:59:46, found empty can at 01:00:09. Parole status wasn't learned until 01:11:42 — a 12-minute gap.",
+        timestamp: "00:59:46 – 01:11:42",
+      },
+      {
+        category: "Unconstitutional Vehicle Entry",
+        sworn: "Report describes encounter as routine 'welfare check'",
+        reality: "Melano physically opened passenger door at 00:56:43. Before opening, he said 'I think it's booze' (00:56:09) — proving criminal investigation motive, not caretaking.",
+        timestamp: "00:56:09 – 00:56:43",
+      },
+      {
+        category: "Retaliatory Arrest for PAS Refusal",
+        sworn: "Report implies probable cause justified arrest",
+        reality: "Meza-Gonzalez told plaintiff PAS was optional ('You're not required to do this') then IMMEDIATELY arrested him when he declined. Arrest was at 01:12 — seconds after lawful refusal.",
+        timestamp: "01:10:30 – 01:12:00",
+      },
+    ];
+
+    function StepCard({ step, index, isExpanded, onToggle }) {
+      const statusColors = {
+        action: { bg: "#FFF7ED", border: "#F97316", badge: "#EA580C", text: "ACTION NEEDED" },
+        complete: { bg: "#F0FDF4", border: "#22C55E", badge: "#16A34A", text: "COMPLETED" },
+        info: { bg: "#F8FAFC", border: "#94A3B8", badge: "#64748B", text: "REFERENCE" },
+      };
+      const s = statusColors[step.status];
+
+      return (
+        <div style={{
+          background: s.bg,
+          borderLeft: `4px solid ${s.border}`,
+          borderRadius: "0 12px 12px 0",
+          marginBottom: 12,
+          overflow: "hidden",
+          transition: "all 0.3s ease",
+          boxShadow: isExpanded ? "0 4px 20px rgba(0,0,0,0.08)" : "0 1px 3px rgba(0,0,0,0.04)",
+        }}>
+          <button onClick={onToggle} style={{
+            width: "100%", display: "flex", alignItems: "center", gap: 12,
+            padding: "16px 20px", background: "none", border: "none",
+            cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans', sans-serif",
+          }}>
+            <span style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              width: 28, height: 28, borderRadius: "50%", background: s.badge,
+              color: "#fff", fontSize: 13, fontWeight: 700,
+              fontFamily: "'JetBrains Mono', monospace", flexShrink: 0,
+            }}>{index + 1}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#1E293B", lineHeight: 1.3 }}>{step.title}</div>
+            </div>
+            <span style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: s.badge,
+              background: `${s.badge}18`, padding: "4px 10px", borderRadius: 6, flexShrink: 0,
+            }}>{s.text}</span>
+            <span style={{ fontSize: 18, color: "#94A3B8", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▾</span>
+          </button>
+
+          {isExpanded && (
+            <div style={{ padding: "0 20px 20px 60px", animation: "fadeIn 0.3s ease" }}>
+              <p style={{ fontSize: 14, lineHeight: 1.7, color: "#475569", margin: "0 0 16px 0", fontFamily: "'DM Sans', sans-serif" }}>{step.detail}</p>
+
+              {step.evidence && (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "#64748B", marginBottom: 8 }}>KEY EVIDENCE</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {step.evidence.map((e, i) => (
+                      <span key={i} style={{ fontSize: 12, background: "#E2E8F0", color: "#334155", padding: "4px 10px", borderRadius: 6, fontFamily: "'JetBrains Mono', monospace" }}>{e}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step.laws && (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "#64748B", marginBottom: 8 }}>APPLICABLE LAW</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {step.laws.map((l, i) => (
+                      <span key={i} style={{ fontSize: 12, background: "#FEF2F2", color: "#991B1B", padding: "4px 10px", borderRadius: 6, fontWeight: 500 }}>{l}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step.contact && (
+                <div style={{
+                  background: "#F1F5F9", borderRadius: 8, padding: 14, fontSize: 13,
+                  color: "#334155", whiteSpace: "pre-line", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.6,
+                }}>📬 {step.contact}</div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function EvidenceCard({ item }) {
+      const [open, setOpen] = useState(false);
+      return (
+        <div style={{ background: "#0F172A", borderRadius: 12, overflow: "hidden", marginBottom: 10, border: "1px solid #1E293B" }}>
+          <button onClick={() => setOpen(!open)} style={{
+            width: "100%", display: "flex", alignItems: "center", gap: 12,
+            padding: "14px 18px", background: "none", border: "none", cursor: "pointer", textAlign: "left",
+          }}>
+            <span style={{ fontSize: 22 }}>🔍</span>
+            <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: "#F8FAFC", fontFamily: "'DM Sans', sans-serif" }}>{item.category}</span>
+            <span style={{ fontSize: 11, color: "#F59E0B", fontFamily: "'JetBrains Mono', monospace", background: "#F59E0B18", padding: "3px 8px", borderRadius: 4 }}>{item.timestamp}</span>
+            <span style={{ color: "#64748B", transform: open ? "rotate(180deg)" : "", transition: "0.2s" }}>▾</span>
+          </button>
+          {open && (
+            <div style={{ padding: "0 18px 18px 52px" }}>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "#EF4444", marginBottom: 6 }}>WHAT HE SWORE ✕</div>
+                <p style={{ fontSize: 13, color: "#FCA5A5", lineHeight: 1.6, margin: 0, fontStyle: "italic", fontFamily: "'DM Sans', sans-serif" }}>{item.sworn}</p>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "#22C55E", marginBottom: 6 }}>WHAT ACTUALLY HAPPENED ✓</div>
+                <p style={{ fontSize: 13, color: "#86EFAC", lineHeight: 1.6, margin: 0, fontFamily: "'DM Sans', sans-serif" }}>{item.reality}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function ProgressRing({ completed, total, color }) {
+      const pct = total > 0 ? (completed / total) * 100 : 0;
+      const r = 18;
+      const circ = 2 * Math.PI * r;
+      const offset = circ - (pct / 100) * circ;
+      return (
+        <svg width="44" height="44" style={{ flexShrink: 0 }}>
+          <circle cx="22" cy="22" r={r} fill="none" stroke="#E2E8F0" strokeWidth="4" />
+          <circle cx="22" cy="22" r={r} fill="none" stroke={color} strokeWidth="4" strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round" transform="rotate(-90 22 22)" style={{ transition: "stroke-dashoffset 0.6s ease" }} />
+          <text x="22" y="26" textAnchor="middle" fill={color} fontSize="11" fontWeight="700" fontFamily="'JetBrains Mono', monospace">{completed}/{total}</text>
+        </svg>
+      );
+    }
+
+    function AccountabilityPortal() {
+      const [activeTrack, setActiveTrack] = useState("criminal");
+      const [expandedSteps, setExpandedSteps] = useState({});
+      const [completedSteps, setCompletedSteps] = useState({});
+      const [view, setView] = useState("tracks");
+      const [loaded, setLoaded] = useState(false);
+
+      useEffect(() => {
+        setLoaded(true);
+        try {
+          const saved = localStorage.getItem("accountability-progress");
+          if (saved) setCompletedSteps(JSON.parse(saved));
+        } catch {}
+      }, []);
+
+      const saveProgress = (newState) => {
+        try {
+          localStorage.setItem("accountability-progress", JSON.stringify(newState));
+        } catch {}
+      };
+
+      const toggleStep = (trackId, stepIdx) => {
+        setExpandedSteps((prev) => ({ ...prev, [`${trackId}-${stepIdx}`]: !prev[`${trackId}-${stepIdx}`] }));
+      };
+
+      const toggleComplete = (trackId, stepIdx) => {
+        const key = `${trackId}-${stepIdx}`;
+        const newState = { ...completedSteps, [key]: !completedSteps[key] };
+        setCompletedSteps(newState);
+        saveProgress(newState);
+      };
+
+      const getTrackProgress = (track) => {
+        const actionSteps = track.steps.filter((s) => s.status === "action");
+        const done = actionSteps.filter((_, i) => {
+          const realIdx = track.steps.indexOf(actionSteps[i]);
+          return completedSteps[`${track.id}-${realIdx}`];
+        }).length;
+        return { done, total: actionSteps.length };
+      };
+
+      const totalActions = ACCOUNTABILITY_TRACKS.reduce((a, t) => a + t.steps.filter((s) => s.status === "action").length, 0);
+      const totalDone = ACCOUNTABILITY_TRACKS.reduce((a, t) => {
+        const p = getTrackProgress(t);
+        return a + p.done;
+      }, 0);
+
+      const currentTrack = ACCOUNTABILITY_TRACKS.find((t) => t.id === activeTrack);
+
+      return (
+        <div style={{
+          minHeight: "100vh", background: "#F8FAFC", fontFamily: "'DM Sans', sans-serif",
+          opacity: loaded ? 1 : 0, transition: "opacity 0.5s ease",
+        }}>
+          {/* Header */}
+          <div style={{
+            background: "linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%)",
+            padding: "32px 24px 28px", position: "relative", overflow: "hidden",
+          }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "radial-gradient(ellipse at 30% 0%, rgba(220,38,38,0.12) 0%, transparent 60%)" }} />
+            <div style={{ position: "relative", maxWidth: 800, margin: "0 auto" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#EF4444", animation: "pulse 2s infinite", display: "inline-block" }} />
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", color: "#EF4444" }}>ACTIVE CASE</span>
+              </div>
+              <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 900, color: "#F8FAFC", lineHeight: 1.15, marginBottom: 8 }}>
+                Officer Accountability Portal
+              </h1>
+              <p style={{ fontSize: 14, color: "#94A3B8", lineHeight: 1.5, marginBottom: 16 }}>
+                <span style={{ color: "#F8FAFC", fontWeight: 600 }}>Ofc. {CASE_DATA.officer}</span>{" "}
+                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "#64748B" }}>Badge {CASE_DATA.badge}</span>
+                <br />
+                CHP Case {CASE_DATA.caseNumber} · Federal Case {CASE_DATA.federalCase}
+              </p>
+              <div style={{
+                display: "flex", alignItems: "center", gap: 14,
+                background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "12px 16px",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}>
+                <ProgressRing completed={totalDone} total={totalActions} color="#22C55E" />
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>{totalDone} of {totalActions} action items completed</div>
+                  <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>across {ACCOUNTABILITY_TRACKS.length} accountability tracks</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
+            {/* Tab Nav */}
+            <div style={{
+              display: "flex", gap: 4, background: "#E2E8F0", borderRadius: 10, padding: 4,
+              marginTop: -14, position: "relative", zIndex: 10,
+            }}>
+              {[
+                { id: "tracks", label: "Action Tracks" },
+                { id: "evidence", label: "Evidence Matrix" },
+                { id: "timeline", label: "Key Dates" },
+              ].map((tab) => (
+                <button key={tab.id} onClick={() => setView(tab.id)} style={{
+                  flex: 1, padding: "10px 8px", borderRadius: 8, border: "none",
+                  background: view === tab.id ? "#fff" : "transparent",
+                  color: view === tab.id ? "#0F172A" : "#64748B",
+                  fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
+                  boxShadow: view === tab.id ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                }}>{tab.label}</button>
+              ))}
+            </div>
+
+            {/* TRACKS VIEW */}
+            {view === "tracks" && (
+              <div style={{ marginTop: 20, animation: "fadeIn 0.4s ease" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 20 }}>
+                  {ACCOUNTABILITY_TRACKS.map((track) => {
+                    const prog = getTrackProgress(track);
+                    const isActive = activeTrack === track.id;
+                    return (
+                      <button key={track.id} onClick={() => setActiveTrack(track.id)} style={{
+                        padding: "12px 10px", borderRadius: 12,
+                        border: `2px solid ${isActive ? track.color : "#E2E8F0"}`,
+                        background: isActive ? track.accent : "#fff",
+                        cursor: "pointer", textAlign: "center", transition: "all 0.2s",
+                        transform: isActive ? "scale(1.02)" : "scale(1)",
+                      }}>
+                        <div style={{ fontSize: 22, marginBottom: 4 }}>{track.icon}</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: track.color, lineHeight: 1.3 }}>{track.title}</div>
+                        {prog.total > 0 && (
+                          <div style={{ fontSize: 10, color: "#64748B", marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>{prog.done}/{prog.total}</div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {currentTrack && (
+                  <div style={{ animation: "slideIn 0.3s ease" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
+                      <span style={{ fontSize: 28 }}>{currentTrack.icon}</span>
+                      <div>
+                        <h2 style={{ fontSize: 20, fontWeight: 800, color: "#0F172A", fontFamily: "'Playfair Display', serif" }}>{currentTrack.title}</h2>
+                        <p style={{ fontSize: 13, color: "#64748B" }}>{currentTrack.description}</p>
+                      </div>
+                    </div>
+                    <div style={{
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                      background: `${currentTrack.color}12`, padding: "6px 12px", borderRadius: 6, marginBottom: 16,
+                    }}>
+                      <span style={{ fontSize: 12 }}>⏰</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: currentTrack.color }}>{currentTrack.deadline}</span>
+                    </div>
+
+                    {currentTrack.steps.map((step, idx) => (
+                      <div key={idx} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                        {step.status === "action" && (
+                          <button onClick={() => toggleComplete(currentTrack.id, idx)} style={{
+                            marginTop: 18, width: 22, height: 22, borderRadius: 6,
+                            border: `2px solid ${completedSteps[`${currentTrack.id}-${idx}`] ? "#22C55E" : "#CBD5E1"}`,
+                            background: completedSteps[`${currentTrack.id}-${idx}`] ? "#22C55E" : "transparent",
+                            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                            flexShrink: 0, transition: "all 0.2s",
+                          }}>
+                            {completedSteps[`${currentTrack.id}-${idx}`] && <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>✓</span>}
+                          </button>
+                        )}
+                        <div style={{ flex: 1 }}>
+                          <StepCard step={step} index={idx} isExpanded={expandedSteps[`${currentTrack.id}-${idx}`]} onToggle={() => toggleStep(currentTrack.id, idx)} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* EVIDENCE VIEW */}
+            {view === "evidence" && (
+              <div style={{ marginTop: 20, animation: "fadeIn 0.4s ease" }}>
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: "#F8FAFC", fontFamily: "'Playfair Display', serif", background: "#0F172A", padding: "16px 20px", borderRadius: "12px 12px 0 0", marginBottom: 0 }}>
+                  🔬 Sworn Statements vs. Dashcam Reality
+                </h2>
+                <div style={{ background: "#0F172A", borderRadius: "0 0 12px 12px", padding: "4px 12px 12px" }}>
+                  {EVIDENCE_HIGHLIGHTS.map((item, idx) => (
+                    <EvidenceCard key={idx} item={item} />
+                  ))}
+                </div>
+                <div style={{ marginTop: 16, background: "#FEF2F2", borderRadius: 12, padding: 16, border: "1px solid #FECACA" }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#991B1B", marginBottom: 6 }}>⚠️ Critical Institutional Admission</div>
+                  <p style={{ fontSize: 13, color: "#7F1D1D", lineHeight: 1.6 }}>
+                    The Dublin CHP Area Office issued a <strong>PC §849(b)(1) Detention Certificate</strong> on November 5, 2024, formally acknowledging{" "}
+                    <strong>"insufficient grounds for making a criminal complaint."</strong> This is the CHP's OWN supervisors admitting the arrest was unjustified — yet the falsified DS-367 was still sent to DMV to suspend your CDL.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* TIMELINE VIEW */}
+            {view === "timeline" && (
+              <div style={{ marginTop: 20, animation: "fadeIn 0.4s ease" }}>
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: "#0F172A", fontFamily: "'Playfair Display', serif", marginBottom: 16 }}>📅 Critical Case Timeline</h2>
+                {[
+                  { date: "Nov 1, 2024", event: "Incident on I-580 — unlawful detention, search, arrest, forced blood draw, incarceration at Santa Rita Jail", type: "incident" },
+                  { date: "Nov 5, 2024", event: "CHP Dublin issues PC §849(b)(1) Detention Certificate — 'insufficient grounds'", type: "win" },
+                  { date: "Dec 1, 2024", event: "APS suspension effective date — CDL commercially disqualified", type: "adverse" },
+                  { date: "Dec 4, 2024", event: "DMV discovery provided — DS-367, arrest report, driving record", type: "neutral" },
+                  { date: "Dec 9, 2024", event: "Statement of Facts and Defense submitted to DMV", type: "action" },
+                  { date: "Jan 24, 2025", event: "DMV APS telephone hearing with Hearing Officer Diana Candelaria", type: "action" },
+                  { date: "Apr 2025", event: "Government tort claim filed with DGS (6-month deadline met)", type: "action" },
+                  { date: "May 12, 2025", event: "CHP issues Detention Certificate — further confirms insufficient grounds", type: "win" },
+                  { date: "May 27, 2025", event: "Federal §1983 complaint filed — E.D. Cal. Case 2:25-cv-01460-DC-CSK", type: "action" },
+                  { date: "Feb 4, 2026", event: "State tort/Bane Act complaint filed — Alameda County Superior Court", type: "action" },
+                  { date: "~Nov 2027+", event: "Criminal SOL for perjury (PC §118) — 3 years + delayed discovery tolling", type: "deadline" },
+                ].map((item, idx, arr) => (
+                  <div key={idx} style={{ display: "flex", gap: 14, marginBottom: 2 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 20, flexShrink: 0 }}>
+                      <div style={{
+                        width: 12, height: 12, borderRadius: "50%", flexShrink: 0, marginTop: 4,
+                        background: item.type === "incident" ? "#EF4444" : item.type === "win" ? "#22C55E" : item.type === "adverse" ? "#F59E0B" : item.type === "deadline" ? "#7C3AED" : "#3B82F6",
+                      }} />
+                      {idx < arr.length - 1 && <div style={{ width: 2, flex: 1, background: "#E2E8F0", minHeight: 30 }} />}
+                    </div>
+                    <div style={{ paddingBottom: 16 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", fontFamily: "'JetBrains Mono', monospace", marginBottom: 2 }}>{item.date}</div>
+                      <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.5 }}>{item.event}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Footer */}
+            <div style={{ textAlign: "center", padding: "32px 0 24px", borderTop: "1px solid #E2E8F0", marginTop: 32 }}>
+              <p style={{ fontSize: 11, color: "#94A3B8", lineHeight: 1.6 }}>
+                This portal is for organizational reference only. It is not legal advice.<br />
+                Always consult a licensed attorney before taking legal action.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<AccountabilityPortal />);
+  </script>
+</body>
+</html>
